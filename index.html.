@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Afterhours AI</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #090711;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+header {
+  padding: 25px 18px;
+  text-align: center;
+  border-bottom: 1px solid #30233f;
+}
+.logo {
+  color: #c49aff;
+  font-size: 27px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+.hero {
+  text-align: center;
+  padding: 55px 20px 35px;
+}
+.hero h1 {
+  font-size: 36px;
+  line-height: 1.15;
+}
+.hero p { color: #b9afc8; line-height: 1.6; }
+button {
+  background: #9a62d6;
+  border: 0;
+  padding: 13px 22px;
+  border-radius: 25px;
+  color: white;
+  font-weight: bold;
+}
+h2 { padding: 0 20px; }
+.characters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 15px 20px 40px;
+}
+.character {
+  background: #171222;
+  border: 1px solid #39264e;
+  border-radius: 17px;
+  padding: 22px;
+}
+.character h3 { color: #d4aaff; }
+.character p { color: #b9afc8; line-height: 1.5; }
+.tag {
+  color: #c49aff;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #8e849d;
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AFTERHOURS AI</div>
+</header>
+
+<section class="hero">
+  <p class="tag">YOUR WORLD. YOUR STORIES.</p>
+  <h1>A universe of stories awaits.</h1>
+  <p>Meet fictional AI personalities, explore imaginative stories and enjoy conversations in your own creative space.</p>
+  <button onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">
+    Explore Characters
+  </button>
+</section>
+
+<h2>Meet Your Characters</h2>
+
+<section class="characters" id="characters">
+
+  <div class="character">
+    <p class="tag">THE MYSTERIOUS WRITER</p>
+    <h3>Adrian</h3>
+    <p>A thoughtful novelist with a love for literature, mysteries and meaningful conversations.</p>
+    <button onclick="chat('Adrian')">Meet Adrian</button>
+  </div>
+
+  <div class="character">
+    <p class="tag">THE CREATIVE DREAMER</p>
+    <h3>Maya</h3>
+    <p>An imaginative artist who loves music, adventure and creating unforgettable stories.</p>
+    <button onclick="chat('Maya')">Meet Maya</button>
+  </div>
+
+  <div class="character">
+    <p class="tag">THE CURIOUS EXPLORER</p>
+    <h3>Leo</h3>
+    <p>A curious traveller who enjoys discovering new places, ideas and adventures.</p>
+    <button onclick="chat('Leo')">Meet Leo</button>
+  </div>
+
+</section>
+
+<footer>
+  AFTERHOURS AI © 2026<br>
+  A creative world of fictional conversations.
+</footer>
+
+<script>
+function chat(name) {
+  alert("Welcome! " + name + "'s story experience is coming soon.");
+}
+</script>
+
+</body>
+</html>
