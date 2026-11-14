@@ -610,7 +610,8 @@ loadSession();
   window.speechSynthesis.cancel();
 
   const voice = new SpeechSynthesisUtterance(text);
-
+const voices = window.speechSynthesis.getVoices();
+if (voices.length > 0) voice.voice = voices[0];
   const settings = {
     Adrian: { rate: 0.88, pitch: 0.85 },
     Maya: { rate: 1.08, pitch: 1.15 },
