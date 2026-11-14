@@ -581,7 +581,7 @@ async function sendMessage() {
       data.reply || "Let's continue our story!";
 
     loading.textContent = reply;
-
+speakReply(reply, activeCharacter);
     history.push({
       role: "assistant",
       content: reply
@@ -604,6 +604,27 @@ async function sendMessage() {
 }
 
 loadSession();
+  function speakReply(text, character) {
+  if (!("speechSynthesis" in window)) return;
+
+  window.speechSynthesis.cancel();
+
+  const voice = new SpeechSynthesisUtterance(text);
+
+  const settings = {
+    Adrian: { rate: 0.88, pitch: 0.85 },
+    Maya: { rate: 1.08, pitch: 1.15 },
+    Leo: { rate: 1.0, pitch: 1.0 }
+  };
+
+  const style = settings[character] || settings.Adrian;
+
+  voice.rate = style.rate;
+  voice.pitch = style.pitch;
+  voice.volume = 1;
+
+  window.speechSynthesis.speak(voice);
+}
 </script>
 
 </body>
