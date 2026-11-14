@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -282,7 +283,10 @@ footer {
   <div id="memoryForm" style="display:none; margin-top:20px;">
     <h3 style="color:#d4aaff;">Add a preference</h3>
 
-    <p>Only save simple preferences, such as favourite story genres or hobbies. Don't enter private or sensitive information.</p>
+    <p>
+      Save simple preferences such as favourite story genres
+      or hobbies. Don't enter private or sensitive information.
+    </p>
 
     <select id="memoryCategory">
       <option value="general">General preference</option>
@@ -332,6 +336,13 @@ footer {
 
 <script>
 let activeCharacter = "Adrian";
+
+let conversationHistory = {
+  Adrian: [],
+  Maya: [],
+  Leo: []
+};
+
 let busy = false;
 let memoryEnabled = false;
 
@@ -369,7 +380,8 @@ async function loadSession() {
       memoryEnabled ? "block" : "none";
 
   } catch (error) {
-    status.textContent = "Could not load memory settings. Please refresh.";
+    status.textContent =
+      "Could not load memory settings. Please refresh.";
   }
 }
 
@@ -434,7 +446,9 @@ async function loadMemories() {
 }
 
 async function saveMemory() {
-  const category = document.getElementById("memoryCategory").value;
+  const category =
+    document.getElementById("memoryCategory").value;
+
   const input = document.getElementById("memoryText");
   const memory = input.value.trim();
   const status = document.getElementById("memoryStatus");
@@ -474,7 +488,8 @@ async function deleteMemories() {
     await api("/api/memory", { method: "DELETE" });
 
     document.getElementById("memoryList").innerHTML = "";
-    status.textContent = "All saved preferences have been deleted.";
+    status.textContent =
+      "All saved preferences have been deleted.";
 
   } catch (error) {
     status.textContent = error.message;
@@ -483,14 +498,31 @@ async function deleteMemories() {
 
 function chat(name) {
   activeCharacter = name;
+
   document.getElementById("characterName").textContent = name;
-  document.getElementById("messages").innerHTML = "";
   document.getElementById("chatWindow").style.display = "block";
 
-  addMessage(
-    "bot",
-    "Hello! I'm " + name + ". What story shall we explore today?"
-  );
+  const messages = document.getElementById("messages");
+  messages.innerHTML = "";
+
+  const history = conversationHistory[name];
+
+  if (history.length === 0) {
+    const greeting =
+      "Hello! I'm " + name + ". What story shall we explore today?";
+
+    history.push({
+      role: "assistant",
+      content: greeting
+    });
+  }
+
+  history.forEach(item => {
+    addMessage(
+      item.role === "user" ? "user" : "bot",
+      item.content
+    );
+  });
 }
 
 function closeChat() {
@@ -499,6 +531,7 @@ function closeChat() {
 
 function addMessage(type, text) {
   const bubble = document.createElement("div");
+
   bubble.className = "message " + type;
   bubble.textContent = text;
 
@@ -517,6 +550,8 @@ async function sendMessage() {
 
   if (!message) return;
 
+  const history = conversationHistory[activeCharacter];
+
   addMessage("user", message);
   input.value = "";
   busy = true;
@@ -526,20 +561,41 @@ async function sendMessage() {
 
   const loading = addMessage("bot", "Thinking...");
 
+  history.push({
+    role: "user",
+    content: message
+  });
+
   try {
     const data = await api("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         character: activeCharacter,
-        message: message
+        message: message,
+        history: history.slice(-12)
       })
     });
 
-    loading.textContent = data.reply || "Let's continue our story!";
+    const reply =
+      data.reply || "Let's continue our story!";
+
+    loading.textContent = reply;
+
+    history.push({
+      role: "assistant",
+      content: reply
+    });
+
+    conversationHistory[activeCharacter] =
+      history.slice(-12);
 
   } catch (error) {
-    loading.textContent = "I couldn't connect just now. Please try again.";
+    loading.textContent =
+      "I couldn't connect just now. Please try again.";
+
+    history.pop();
+
   } finally {
     busy = false;
     sendButton.disabled = false;
