@@ -10,7 +10,7 @@
 body {
   margin: 0;
   background: #090711;
-  color: #fff;
+  color: white;
   font-family: Arial, sans-serif;
 }
 header {
@@ -24,14 +24,8 @@ header {
   font-weight: bold;
   letter-spacing: 2px;
 }
-.hero {
-  text-align: center;
-  padding: 55px 20px 35px;
-}
-.hero h1 {
-  font-size: 36px;
-  line-height: 1.15;
-}
+.hero { text-align: center; padding: 55px 20px 35px; }
+.hero h1 { font-size: 36px; line-height: 1.15; }
 .hero p { color: #b9afc8; line-height: 1.6; }
 button {
   background: #9a62d6;
@@ -40,6 +34,7 @@ button {
   border-radius: 25px;
   color: white;
   font-weight: bold;
+  cursor: pointer;
 }
 h2 { padding: 0 20px; }
 .characters {
@@ -56,16 +51,58 @@ h2 { padding: 0 20px; }
 }
 .character h3 { color: #d4aaff; }
 .character p { color: #b9afc8; line-height: 1.5; }
-.tag {
-  color: #c49aff;
-  font-size: 12px;
-  letter-spacing: 1px;
-}
+.tag { color: #c49aff; font-size: 12px; letter-spacing: 1px; }
 footer {
   text-align: center;
   padding: 25px;
   color: #8e849d;
   font-size: 12px;
+}
+#chatWindow {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #090711;
+  z-index: 9999;
+  padding: 18px;
+}
+.chatPanel {
+  max-width: 500px;
+  height: 90vh;
+  margin: auto;
+  background: #171222;
+  border: 1px solid #9a62d6;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #d4aaff;
+}
+#messages { flex: 1; overflow-y: auto; padding: 12px 0; }
+.message {
+  padding: 12px;
+  margin: 9px 0;
+  border-radius: 12px;
+  max-width: 85%;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.bot { background: #30213f; color: white; }
+.user { background: #8754bd; margin-left: auto; color: white; }
+.chatInput { display: flex; gap: 7px; }
+.chatInput input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #65458a;
+  background: #090711;
+  color: white;
 }
 </style>
 </head>
@@ -87,7 +124,6 @@ footer {
 <h2>Meet Your Characters</h2>
 
 <section class="characters" id="characters">
-
   <div class="character">
     <p class="tag">THE MYSTERIOUS WRITER</p>
     <h3>Adrian</h3>
@@ -108,81 +144,12 @@ footer {
     <p>A curious traveller who enjoys discovering new places, ideas and adventures.</p>
     <button onclick="chat('Leo')">Meet Leo</button>
   </div>
-
 </section>
 
 <footer>
   AFTERHOURS AI © 2026<br>
   A creative world of fictional conversations.
 </footer>
-
-<script>
-function chat(name) {
-  alert("Welcome! " + name + "'s story experience is coming soon.");
-}
-</script>
-
-<style>
-#chatWindow {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#090711;
-  z-index:9999;
-  padding:18px;
-}
-.chatPanel {
-  max-width:500px;
-  height:90vh;
-  margin:auto;
-  background:#171222;
-  border:1px solid #9a62d6;
-  border-radius:18px;
-  display:flex;
-  flex-direction:column;
-  padding:15px;
-}
-.chatHeader {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  color:#d4aaff;
-}
-#messages {
-  flex:1;
-  overflow-y:auto;
-  padding:12px 0;
-}
-.message {
-  padding:12px;
-  margin:9px 0;
-  border-radius:12px;
-  max-width:85%;
-  line-height:1.5;
-}
-.bot {
-  background:#30213f;
-  color:white;
-}
-.user {
-  background:#8754bd;
-  margin-left:auto;
-  color:white;
-}
-.chatInput {
-  display:flex;
-  gap:7px;
-}
-.chatInput input {
-  flex:1;
-  min-width:0;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #65458a;
-  background:#090711;
-  color:white;
-}
-</style>
 
 <div id="chatWindow">
   <div class="chatPanel">
@@ -193,63 +160,82 @@ function chat(name) {
     <p style="color:#b9afc8">Your fictional story conversation</p>
     <div id="messages"></div>
     <div class="chatInput">
-      <input id="userMessage"
-        placeholder="Write a message..."
+      <input id="userMessage" placeholder="Write a message..."
         onkeydown="if(event.key==='Enter') sendMessage()">
-      <button onclick="sendMessage()">Send</button>
+      <button id="sendButton" onclick="sendMessage()">Send</button>
     </div>
   </div>
 </div>
 
 <script>
 let activeCharacter = "Adrian";
+let busy = false;
 
 function chat(name) {
   activeCharacter = name;
   document.getElementById("characterName").textContent = name;
-  document.getElementById("messages").innerHTML =
-    '<div class="message bot">Hello! I am ' + name +
-    '. Welcome to my story. What would you like to talk about?</div>';
+  document.getElementById("messages").innerHTML = "";
   document.getElementById("chatWindow").style.display = "block";
+
+  addMessage("bot", "Hello! I'm " + name + ". What story shall we explore today?");
 }
 
 function closeChat() {
   document.getElementById("chatWindow").style.display = "none";
 }
 
-function sendMessage() {
+function addMessage(type, text) {
+  const bubble = document.createElement("div");
+  bubble.className = "message " + type;
+  bubble.textContent = text;
+  const messages = document.getElementById("messages");
+  messages.appendChild(bubble);
+  messages.scrollTop = messages.scrollHeight;
+  return bubble;
+}
+
+async function sendMessage() {
+  if (busy) return;
+
   const input = document.getElementById("userMessage");
   const message = input.value.trim();
   if (!message) return;
 
-  const messages = document.getElementById("messages");
-
-  const userBubble = document.createElement("div");
-  userBubble.className = "message user";
-  userBubble.textContent = message;
-  messages.appendChild(userBubble);
-
+  addMessage("user", message);
   input.value = "";
+  busy = true;
 
-  const replies = {
-    Adrian: "That's an interesting thought. Tell me more. I enjoy exploring ideas and stories.",
-    Maya: "I love that! It gives me an idea for a creative adventure. What happens next?",
-    Leo: "That sounds like an adventure worth exploring! Where should our story take us?"
-  };
+  const sendButton = document.getElementById("sendButton");
+  sendButton.disabled = true;
 
-  setTimeout(function() {
-    const reply = document.createElement("div");
-    reply.className = "message bot";
-    reply.textContent = replies[activeCharacter];
-    messages.appendChild(reply);
-    messages.scrollTop = messages.scrollHeight;
-  }, 500);
+  const loading = addMessage("bot", "Thinking...");
 
-  messages.scrollTop = messages.scrollHeight;
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        character: activeCharacter,
+        message: message
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Chat unavailable");
+    }
+
+    loading.textContent = data.reply || "Let's continue our story!";
+  } catch (error) {
+    loading.textContent = "I couldn't connect just now. Please try again.";
+  } finally {
+    busy = false;
+    sendButton.disabled = false;
+    input.focus();
+  }
 }
 </script>
-</body>
-</html>
 
 </body>
 </html>
