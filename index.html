@@ -1,32 +1,48 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Afterhours AI</title>
+
 <style>
 * { box-sizing: border-box; }
+
 body {
   margin: 0;
   background: #090711;
   color: white;
   font-family: Arial, sans-serif;
 }
+
 header {
   padding: 25px 18px;
   text-align: center;
   border-bottom: 1px solid #30233f;
 }
+
 .logo {
   color: #c49aff;
   font-size: 27px;
   font-weight: bold;
   letter-spacing: 2px;
 }
-.hero { text-align: center; padding: 55px 20px 35px; }
-.hero h1 { font-size: 36px; line-height: 1.15; }
-.hero p { color: #b9afc8; line-height: 1.6; }
+
+.hero {
+  text-align: center;
+  padding: 55px 20px 35px;
+}
+
+.hero h1 {
+  font-size: 36px;
+  line-height: 1.15;
+}
+
+.hero p {
+  color: #b9afc8;
+  line-height: 1.6;
+}
+
 button {
   background: #9a62d6;
   border: 0;
@@ -36,28 +52,97 @@ button {
   font-weight: bold;
   cursor: pointer;
 }
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 h2 { padding: 0 20px; }
+
 .characters {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
   padding: 15px 20px 40px;
 }
+
 .character {
   background: #171222;
   border: 1px solid #39264e;
   border-radius: 17px;
   padding: 22px;
 }
+
 .character h3 { color: #d4aaff; }
-.character p { color: #b9afc8; line-height: 1.5; }
-.tag { color: #c49aff; font-size: 12px; letter-spacing: 1px; }
+
+.character p {
+  color: #b9afc8;
+  line-height: 1.5;
+}
+
+.tag {
+  color: #c49aff;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.memory-section {
+  margin: 20px;
+  padding: 22px;
+  background: #171222;
+  border: 1px solid #39264e;
+  border-radius: 17px;
+}
+
+.memory-section h2 {
+  padding: 0;
+  color: #d4aaff;
+}
+
+.memory-section p {
+  color: #b9afc8;
+  line-height: 1.5;
+}
+
+.memory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.memory-section input,
+.memory-section select {
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0;
+  border-radius: 10px;
+  border: 1px solid #65458a;
+  background: #090711;
+  color: white;
+}
+
+.memory-status {
+  color: #c49aff;
+  font-size: 13px;
+}
+
+.memory-item {
+  padding: 12px;
+  margin-top: 10px;
+  background: #30213f;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
 footer {
   text-align: center;
   padding: 25px;
   color: #8e849d;
   font-size: 12px;
 }
+
 #chatWindow {
   display: none;
   position: fixed;
@@ -66,6 +151,7 @@ footer {
   z-index: 9999;
   padding: 18px;
 }
+
 .chatPanel {
   max-width: 500px;
   height: 90vh;
@@ -77,13 +163,20 @@ footer {
   flex-direction: column;
   padding: 15px;
 }
+
 .chatHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #d4aaff;
 }
-#messages { flex: 1; overflow-y: auto; padding: 12px 0; }
+
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
 .message {
   padding: 12px;
   margin: 9px 0;
@@ -91,10 +184,25 @@ footer {
   max-width: 85%;
   line-height: 1.5;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
-.bot { background: #30213f; color: white; }
-.user { background: #8754bd; margin-left: auto; color: white; }
-.chatInput { display: flex; gap: 7px; }
+
+.bot {
+  background: #30213f;
+  color: white;
+}
+
+.user {
+  background: #8754bd;
+  margin-left: auto;
+  color: white;
+}
+
+.chatInput {
+  display: flex;
+  gap: 7px;
+}
+
 .chatInput input {
   flex: 1;
   min-width: 0;
@@ -106,6 +214,7 @@ footer {
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -124,6 +233,7 @@ footer {
 <h2>Meet Your Characters</h2>
 
 <section class="characters" id="characters">
+
   <div class="character">
     <p class="tag">THE MYSTERIOUS WRITER</p>
     <h3>Adrian</h3>
@@ -144,6 +254,51 @@ footer {
     <p>A curious traveller who enjoys discovering new places, ideas and adventures.</p>
     <button onclick="chat('Leo')">Meet Leo</button>
   </div>
+
+</section>
+
+<section class="memory-section">
+  <h2>Memory Settings</h2>
+
+  <p>
+    Choose whether Afterhours AI may save a few preferences
+    for future conversations. Memory is optional and stays
+    under your control.
+  </p>
+
+  <p class="memory-status" id="memoryStatus">
+    Checking memory settings...
+  </p>
+
+  <div class="memory-actions">
+    <button onclick="toggleMemory(true)">Enable Memory</button>
+    <button onclick="toggleMemory(false)">Disable Memory</button>
+    <button onclick="loadMemories()">View Memories</button>
+    <button onclick="deleteMemories()">Delete Memories</button>
+  </div>
+
+  <div id="memoryList"></div>
+
+  <div id="memoryForm" style="display:none; margin-top:20px;">
+    <h3 style="color:#d4aaff;">Add a preference</h3>
+
+    <p>Only save simple preferences, such as favourite story genres or hobbies. Don't enter private or sensitive information.</p>
+
+    <select id="memoryCategory">
+      <option value="general">General preference</option>
+      <option value="food">Favourite snack or food</option>
+      <option value="hobby">Hobby</option>
+      <option value="interest">Interest</option>
+    </select>
+
+    <input
+      id="memoryText"
+      maxlength="240"
+      placeholder="Example: I enjoy mystery stories"
+    >
+
+    <button onclick="saveMemory()">Save Preference</button>
+  </div>
 </section>
 
 <footer>
@@ -153,23 +308,178 @@ footer {
 
 <div id="chatWindow">
   <div class="chatPanel">
+
     <div class="chatHeader">
       <h2 id="characterName">Adrian</h2>
       <button onclick="closeChat()">Close ×</button>
     </div>
+
     <p style="color:#b9afc8">Your fictional story conversation</p>
+
     <div id="messages"></div>
+
     <div class="chatInput">
-      <input id="userMessage" placeholder="Write a message..."
-        onkeydown="if(event.key==='Enter') sendMessage()">
+      <input
+        id="userMessage"
+        placeholder="Write a message..."
+        onkeydown="if(event.key==='Enter') sendMessage()"
+      >
       <button id="sendButton" onclick="sendMessage()">Send</button>
     </div>
+
   </div>
 </div>
 
 <script>
 let activeCharacter = "Adrian";
 let busy = false;
+let memoryEnabled = false;
+
+async function api(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    ...options,
+    headers: {
+      ...(options.headers || {})
+    }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Something went wrong.");
+  }
+
+  return data;
+}
+
+async function loadSession() {
+  const status = document.getElementById("memoryStatus");
+
+  try {
+    const data = await api("/api/session");
+
+    memoryEnabled = data.memoryEnabled;
+
+    status.textContent = memoryEnabled
+      ? "Memory is enabled."
+      : "Memory is switched off.";
+
+    document.getElementById("memoryForm").style.display =
+      memoryEnabled ? "block" : "none";
+
+  } catch (error) {
+    status.textContent = "Could not load memory settings. Please refresh.";
+  }
+}
+
+async function toggleMemory(enabled) {
+  const status = document.getElementById("memoryStatus");
+
+  try {
+    const data = await api("/api/memory/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled })
+    });
+
+    memoryEnabled = data.memoryEnabled;
+
+    status.textContent = memoryEnabled
+      ? "Memory is now enabled."
+      : "Memory is now disabled. Existing saved memories have not been deleted.";
+
+    document.getElementById("memoryForm").style.display =
+      memoryEnabled ? "block" : "none";
+
+    if (!memoryEnabled) {
+      document.getElementById("memoryList").innerHTML = "";
+    }
+
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
+
+async function loadMemories() {
+  const list = document.getElementById("memoryList");
+  list.textContent = "Loading memories...";
+
+  try {
+    const data = await api("/api/memory");
+
+    list.innerHTML = "";
+
+    if (!data.memoryEnabled) {
+      list.textContent = "Enable memory to view saved preferences.";
+      return;
+    }
+
+    if (!data.memories.length) {
+      list.textContent = "No preferences have been saved yet.";
+      return;
+    }
+
+    data.memories.forEach(memory => {
+      const item = document.createElement("div");
+      item.className = "memory-item";
+      item.textContent =
+        memory.category + ": " + memory.memory_text;
+      list.appendChild(item);
+    });
+
+  } catch (error) {
+    list.textContent = error.message;
+  }
+}
+
+async function saveMemory() {
+  const category = document.getElementById("memoryCategory").value;
+  const input = document.getElementById("memoryText");
+  const memory = input.value.trim();
+  const status = document.getElementById("memoryStatus");
+
+  if (!memory) {
+    status.textContent = "Please enter a preference first.";
+    return;
+  }
+
+  try {
+    await api("/api/memory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        category: category,
+        memory_text: memory
+      })
+    });
+
+    input.value = "";
+    status.textContent = "Preference saved.";
+    await loadMemories();
+
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
+
+async function deleteMemories() {
+  if (!confirm("Delete all your saved preferences? This cannot be undone.")) {
+    return;
+  }
+
+  const status = document.getElementById("memoryStatus");
+
+  try {
+    await api("/api/memory", { method: "DELETE" });
+
+    document.getElementById("memoryList").innerHTML = "";
+    status.textContent = "All saved preferences have been deleted.";
+
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
 
 function chat(name) {
   activeCharacter = name;
@@ -177,7 +487,10 @@ function chat(name) {
   document.getElementById("messages").innerHTML = "";
   document.getElementById("chatWindow").style.display = "block";
 
-  addMessage("bot", "Hello! I'm " + name + ". What story shall we explore today?");
+  addMessage(
+    "bot",
+    "Hello! I'm " + name + ". What story shall we explore today?"
+  );
 }
 
 function closeChat() {
@@ -188,9 +501,11 @@ function addMessage(type, text) {
   const bubble = document.createElement("div");
   bubble.className = "message " + type;
   bubble.textContent = text;
+
   const messages = document.getElementById("messages");
   messages.appendChild(bubble);
   messages.scrollTop = messages.scrollHeight;
+
   return bubble;
 }
 
@@ -199,6 +514,7 @@ async function sendMessage() {
 
   const input = document.getElementById("userMessage");
   const message = input.value.trim();
+
   if (!message) return;
 
   addMessage("user", message);
@@ -211,7 +527,7 @@ async function sendMessage() {
   const loading = addMessage("bot", "Thinking...");
 
   try {
-    const response = await fetch("/api/chat", {
+    const data = await api("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -220,13 +536,8 @@ async function sendMessage() {
       })
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Chat unavailable");
-    }
-
     loading.textContent = data.reply || "Let's continue our story!";
+
   } catch (error) {
     loading.textContent = "I couldn't connect just now. Please try again.";
   } finally {
@@ -235,6 +546,8 @@ async function sendMessage() {
     input.focus();
   }
 }
+
+loadSession();
 </script>
 
 </body>
