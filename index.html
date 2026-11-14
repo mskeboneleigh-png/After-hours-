@@ -122,5 +122,134 @@ function chat(name) {
 }
 </script>
 
+<style>
+#chatWindow {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#090711;
+  z-index:9999;
+  padding:18px;
+}
+.chatPanel {
+  max-width:500px;
+  height:90vh;
+  margin:auto;
+  background:#171222;
+  border:1px solid #9a62d6;
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  padding:15px;
+}
+.chatHeader {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#d4aaff;
+}
+#messages {
+  flex:1;
+  overflow-y:auto;
+  padding:12px 0;
+}
+.message {
+  padding:12px;
+  margin:9px 0;
+  border-radius:12px;
+  max-width:85%;
+  line-height:1.5;
+}
+.bot {
+  background:#30213f;
+  color:white;
+}
+.user {
+  background:#8754bd;
+  margin-left:auto;
+  color:white;
+}
+.chatInput {
+  display:flex;
+  gap:7px;
+}
+.chatInput input {
+  flex:1;
+  min-width:0;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #65458a;
+  background:#090711;
+  color:white;
+}
+</style>
+
+<div id="chatWindow">
+  <div class="chatPanel">
+    <div class="chatHeader">
+      <h2 id="characterName">Adrian</h2>
+      <button onclick="closeChat()">Close ×</button>
+    </div>
+    <p style="color:#b9afc8">Your fictional story conversation</p>
+    <div id="messages"></div>
+    <div class="chatInput">
+      <input id="userMessage"
+        placeholder="Write a message..."
+        onkeydown="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let activeCharacter = "Adrian";
+
+function chat(name) {
+  activeCharacter = name;
+  document.getElementById("characterName").textContent = name;
+  document.getElementById("messages").innerHTML =
+    '<div class="message bot">Hello! I am ' + name +
+    '. Welcome to my story. What would you like to talk about?</div>';
+  document.getElementById("chatWindow").style.display = "block";
+}
+
+function closeChat() {
+  document.getElementById("chatWindow").style.display = "none";
+}
+
+function sendMessage() {
+  const input = document.getElementById("userMessage");
+  const message = input.value.trim();
+  if (!message) return;
+
+  const messages = document.getElementById("messages");
+
+  const userBubble = document.createElement("div");
+  userBubble.className = "message user";
+  userBubble.textContent = message;
+  messages.appendChild(userBubble);
+
+  input.value = "";
+
+  const replies = {
+    Adrian: "That's an interesting thought. Tell me more. I enjoy exploring ideas and stories.",
+    Maya: "I love that! It gives me an idea for a creative adventure. What happens next?",
+    Leo: "That sounds like an adventure worth exploring! Where should our story take us?"
+  };
+
+  setTimeout(function() {
+    const reply = document.createElement("div");
+    reply.className = "message bot";
+    reply.textContent = replies[activeCharacter];
+    messages.appendChild(reply);
+    messages.scrollTop = messages.scrollHeight;
+  }, 500);
+
+  messages.scrollTop = messages.scrollHeight;
+}
+</script>
+</body>
+</html>
+
 </body>
 </html>
