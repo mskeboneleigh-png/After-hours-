@@ -1,4 +1,3 @@
-
 function getStyle(message) {
   const text = message.toLowerCase();
 
