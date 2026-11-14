@@ -610,21 +610,57 @@ loadSession();
   window.speechSynthesis.cancel();
 
   const voice = new SpeechSynthesisUtterance(text);
-const voices = window.speechSynthesis.getVoices();
-if (voices.length > 0) voice.voice = voices[0];
+
   const settings = {
-    Adrian: { rate: 0.88, pitch: 0.85 },
-    Maya: { rate: 1.08, pitch: 1.15 },
-    Leo: { rate: 1.0, pitch: 1.0 }
+    Adrian: {
+      rate: 0.88,
+      pitch: 0.85,
+      hint: /male|daniel|david|james|george|mark/i
+    },
+    Maya: {
+      rate: 1.08,
+      pitch: 1.15,
+      hint: /female|samantha|victoria|karen|moira|tessa/i
+    },
+    Leo: {
+      rate: 1.0,
+      pitch: 1.0,
+      hint: /male|daniel|david|james|george|mark/i
+    }
   };
 
   const style = settings[character] || settings.Adrian;
 
-  voice.rate = style.rate;
-  voice.pitch = style.pitch;
-  voice.volume = 1;
+  function startSpeech() {
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoices = voices.filter(v =>
+      v.lang.toLowerCase().startsWith("en")
+    );
 
-  window.speechSynthesis.speak(voice);
+    const chosenVoice = englishVoices.find(v =>
+      style.hint.test(v.name)
+    );
+
+    if (chosenVoice) voice.voice = chosenVoice;
+
+    voice.rate = style.rate;
+    voice.pitch = style.pitch;
+    voice.volume = 1;
+
+    window.speechSynthesis.speak(voice);
+  }
+
+  const voices = window.speechSynthesis.getVoices();
+
+  if (voices.length > 0) {
+    startSpeech();
+  } else {
+    window.speechSynthesis.addEventListener(
+      "voiceschanged",
+      startSpeech,
+      { once: true }
+    );
+  }
 }
 </script>
 
